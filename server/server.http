@@ -1,0 +1,29 @@
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+    "email":"leantu2004@gmail.com",
+    "mobile":"0352243855",
+    "sex":"Nam",
+    "birthday":"stringReq",
+    "password":"123456",
+    "fName":" stringReq",
+    "lName":" stringReq"
+}
+###
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+    "mobile":"0352243855",
+    "password":"123456"
+}
+###
+POST http://localhost:5000/data/role
+Content-Type: application/json
+
+{
+    "value":"ADMIN"
+}
+###
+GET http://localhost:5000/user/65f02c6f81ef3f461317412c
