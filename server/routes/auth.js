@@ -7,15 +7,17 @@ const { email, mobile, stringReq } = require("../middlewares/joiSchema");
 router.post(
   "/register",
   validateJoi(
-    joi.object({
-      mobile,
-      email,
-      sex: stringReq,
-      birthday: stringReq,
-      password: stringReq,
-      fName: stringReq,
-      lName: stringReq,
-    })
+    joi
+      .object({
+        mobile,
+        email,
+        sex: stringReq,
+        birthday: stringReq,
+        password: stringReq,
+        fName: stringReq,
+        lName: stringReq,
+      })
+      .or("email", "mobile")
   ),
   ctrl.register
 );
@@ -24,12 +26,13 @@ router.post(
   validateJoi(
     joi
       .object({
-        email: joi.string().email().optional(),
-        mobile: joi.string().optional(),
+        email,
+        mobile,
         password: joi.string().required(),
       })
       .or("email", "mobile")
   ),
   ctrl.login
 );
+router.get("/finally-register/:code", ctrl.finallyRegister);
 module.exports = router;
