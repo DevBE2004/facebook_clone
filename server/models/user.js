@@ -3,11 +3,25 @@ const bcrypt = require("bcryptjs");
 
 var userSchema = new mongoose.Schema(
   {
-    fName: { type: String, require: true },
-    lName: { type: String, require: true },
-    roleId: { type: mongoose.Types.ObjectId, ref: "Role",default:"User" },
-    email: { type: String, required: true, unique: true },
-    mobile: { type: String, required: true, unique: true },
+    fName: { type: String, required: true },
+    lName: { type: String, required: true },
+    roleId: { type: mongoose.Types.ObjectId, ref: "Role", default: "User" },
+    email: {
+      type: String,
+      unique: true,
+      default: "unique-email-placeholder",
+      required: function () {
+        return this.email !== "unique-email-placeholder" && !this.mobile;
+      },
+    },
+    mobile: {
+      type: String,
+      unique: true,
+      default: "unique-mobile-placeholder",
+      required: function () {
+        return this.mobile !== "unique-mobile-placeholder" && !this.email;
+      },
+    },
     password: { type: String, required: true },
     birthday: { type: String, required: true },
     sex: { type: String, enum: ["Nam", "Nu"], required: true },
@@ -23,9 +37,8 @@ var userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
+  if (!this.isModified("password")) return next();
+
   this.password = bcrypt.hashSync(this.password, bcrypt.genSaltSync(10));
   next();
 });

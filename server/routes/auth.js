@@ -17,7 +17,7 @@ router.post(
         fName: stringReq,
         lName: stringReq,
       })
-      .or("email", "mobile")
+      .xor("email", "mobile")
   ),
   ctrl.register
 );
@@ -30,7 +30,7 @@ router.post(
         mobile,
         password: joi.string().required(),
       })
-      .or("email", "mobile")
+      .xor("email", "mobile")
   ),
   ctrl.login
 );

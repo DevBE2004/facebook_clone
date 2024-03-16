@@ -1,15 +1,21 @@
+    # "email":"leantu2004@gmail.com",
+    # "mobile":"0352243805",
 POST http://localhost:5000/auth/register
 Content-Type: application/json
 
 {
-    "email":"leantu2004@gmail.com",
-    "mobile":"0352243805",
+    "mobile":"0392843804",
     "sex":"Nam",
     "birthday":"stringReq",
     "password":"123456",
     "fName":" stringReq",
     "lName":" stringReq"
 }
+###
+GET http://localhost:5000/auth/finally-register/
+
+
+
 ###
 POST http://localhost:5000/auth/login
 Content-Type: application/json
