@@ -8,22 +8,24 @@ var userSchema = new mongoose.Schema(
     roleId: { type: mongoose.Types.ObjectId, ref: "Role", default: "User" },
     email: {
       type: String,
-      unique: true,
-      default: "unique-email-placeholder",
       required: function () {
-        return this.email !== "unique-email-placeholder" && !this.mobile;
+        return !this.mobile
+      },
+      unique: function () {
+        return this.email !== null && this.email !== undefined;
       },
     },
     mobile: {
       type: String,
-      unique: true,
-      default: "unique-mobile-placeholder",
       required: function () {
-        return this.mobile !== "unique-mobile-placeholder" && !this.email;
+        return !this.email;
+      },
+      unique: function () {
+        return this.mobile !== null && this.mobile !== undefined;
       },
     },
     password: { type: String, required: true },
-    birthday: { type: String, required: true },
+    birthday: { type: Date, required: true },
     sex: { type: String, enum: ["Nam", "Nu"], required: true },
     friends: { type: Array },
     groups: { type: Array },

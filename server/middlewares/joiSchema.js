@@ -7,6 +7,6 @@ module.exports = {
   email: joi.string().email().optional(),
   mobile: joi
     .string()
-    .regex(/^(84|0[35789])([0-9]{8})$/)
+    .regex(/^(84|0[35789])[0-9]{8,9}$/)
     .optional(),
 };

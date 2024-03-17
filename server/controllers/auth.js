@@ -5,8 +5,7 @@ const { errorWithStatus } = require("../middlewares/handleError");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendEmail, sendSMS } = require("../utils/sendCode");
-const { generateCode } = require("../utils/helper");
-
+const { generateCode, formatPhoneNumber } = require("../utils/helper");
 module.exports = {
   register: asyncHandler(async (req, res) => {
     const { email, mobile, ...userData } = req.body;
@@ -49,8 +48,8 @@ module.exports = {
       });
 
       if (newUser) {
-        const message = `Mã code xác thực ứng dụng Facebook của bạn là ${code}. Vui lòng sử dụng mã này để hoàn tất quá trình đăng ký`;
-        sendSMS(mobile, message);
+        const message = `Mã xác thực ứng dụng facebook của bạn là: ${code}`;
+        sendSMS(formatPhoneNumber(mobile), message);
         setTimeout(async () => {
           await User.deleteOne({
             $or: [{ email: emailEdited }, { mobile: mobileEdited }],

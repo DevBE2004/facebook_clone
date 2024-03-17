@@ -12,7 +12,6 @@ module.exports = {
     });
   },
   isAdmin: (req, res, next) => {
-    console.log(req.user)
     if (req.user.role === "ADMIN") next();
     return errorWithStatus(401, "require role Admin.", res);
   },
