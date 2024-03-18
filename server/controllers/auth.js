@@ -12,51 +12,35 @@ module.exports = {
     const code = generateCode(6);
     const emailEdited = email + "!@#$%^" + code;
     const mobileEdited = mobile + "!@#$%^" + code;
-    let newUser;
+
+    const [userExists, role] = await Promise.all([
+      User.exists({ $or: [{ email }, { mobile }] }),
+      Role.findOne({ value: "USER" }).select("_id"),
+    ]);
 
     if (email && !mobile) {
-      const [userExists, role] = await Promise.all([
-        User.exists({ email }),
-        Role.findOne({ value: "USER" }).select("_id"),
-      ]);
-
       if (userExists) return errorWithStatus(403, "User already exists.", res);
 
-      newUser = await User.create({
-        email: emailEdited,
-        roleId: role._id,
-        ...userData,
-      });
-
-      if (newUser) {
-        const subject = `Mã code để xác thực ứng dụng facebook của bạn.`;
-        const link = `http://localhost:5000/auth/finally-register/${code}`;
-        sendEmail(email, subject, code, link);
-      }
+      await User.create({ email: emailEdited, roleId: role._id, ...userData });
+      const subject = `Mã code để xác thực ứng dụng facebook của bạn.`;
+      const link = `http://localhost:5000/auth/finally-register/${code}`;
+      sendEmail(email, subject, code, link);
     } else {
-      const [userExists, role] = await Promise.all([
-        User.exists({ mobile }),
-        Role.findOne({ value: "USER" }).select("_id"),
-      ]);
-
       if (userExists) return errorWithStatus(403, "User already exists.", res);
-
-      newUser = await User.create({
+      await User.create({
         mobile: mobileEdited,
         roleId: role._id,
         ...userData,
       });
 
-      if (newUser) {
-        const message = `Mã xác thực ứng dụng facebook của bạn là: ${code}`;
-        sendSMS(formatPhoneNumber(mobile), message);
-        setTimeout(async () => {
-          await User.deleteOne({
-            $or: [{ email: emailEdited }, { mobile: mobileEdited }],
-          });
-        }, 5 * 60 * 1000);
-      }
+      const message = `Mã xác thực ứng dụng facebook của bạn là: ${code}`;
+      sendSMS(formatPhoneNumber(mobile), message);
     }
+    setTimeout(async () => {
+      await User.deleteOne({
+        $or: [{ email: emailEdited }, { mobile: mobileEdited }],
+      });
+    }, 1 * 60 * 1000);
     return res.status(200).json({
       success: Boolean(newUser) ? true : false,
       message: Boolean(newUser)
@@ -77,10 +61,11 @@ module.exports = {
     const [userNotActive, roleId] = await Promise.all([user, role]);
     if (userNotActive) {
       const updates = { roleId: roleId._id };
-      if (userNotActive.email) updates.email = user.email?.split("!@#$%^")[0];
+      if (userNotActive.email)
+        updates.email = userNotActive.email?.split("!@#$%^")[0];
       if (userNotActive.mobile)
-        updates.mobile = user.mobile?.split("!@#$%^")[0];
-      await User.updateOne({ _id: user._id }, updates);
+        updates.mobile = userNotActive.mobile?.split("!@#$%^")[0];
+      await User.updateOne({ _id: role._id }, updates);
     }
     return res.status(200).json({
       success: Boolean(userNotActive) ? true : false,
